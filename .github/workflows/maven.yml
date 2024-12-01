@@ -29,3 +29,28 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+# Build Docker image
+    - name: Build Docker Image
+      run: |
+        docker build -t demo-app .
+
+    # Run Docker container
+    - name: Run Docker container
+      run: |
+        docker run -d -p 8080:8080 --name demo-app-container demo-app
+
+    # Wait for the app to be available (can be adjusted based on the app startup time)
+    - name: Wait for the app to be available
+      run: |
+        sleep 10  # Adjust if necessary, or use `docker logs` to check when the app is ready.
+
+    # Test the application using curl
+    - name: Access the application using curl
+      run: |
+        curl --fail http://localhost:8080 || exit 1
+
+    # Clean up Docker container (optional)
+    - name: Clean up Docker container
+      run: |
+        docker stop demo-app-container
+        docker rm demo-app-container
